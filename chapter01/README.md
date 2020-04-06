@@ -95,6 +95,7 @@ void main() {
 }
 ```
 
+## 단항 연산자 오버로딩
 ```cpp
 #include <iostream>
 using namespace std;
@@ -225,6 +226,7 @@ void main() {
 //}
 ```
 
+## 이항 연산자 오버로딩
 ```cpp
 #include <iostream>
 using namespace std;
@@ -278,6 +280,9 @@ void main() {
 }
 ```
 
+## 전역 함수를 이용한 연산자 오버로딩
+
+### 멤버 함수를 이용한 연산자 오버로딩
 ```cpp
 #include <iostream>
 using namespace std;
@@ -305,6 +310,7 @@ void main() {
 }
 ```
 
+### 전역 함수를 이용한 연산자 오버로딩
 ```cpp
 #include <iostream>
 using namespace std;
@@ -338,6 +344,7 @@ void main() {
 }
 ```
 
+## STL에 필요한 주요 연산자 오버로딩
 ```cpp
 #include <iostream>
 using namespace std;
@@ -516,5 +523,276 @@ void main() {
 
     ar[0] = 100;  // ar.operator[](int) 를 호출합니다.
     //ar[1] = 100; 에러! 상수 객체(값)를 리턴하므로 대입할 수 없습니다.
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+void main() {
+    Point *p1 = new Point(2, 3);  //메모리 할당
+    Point *p2 = new Point(5, 5);  //메모리 할당
+
+    p1->Print();  //p1의 멤버 함수 호출(서비스 사용)
+    p2->Print();  //p2의 멤버 함수 호출(서비스 사용)
+
+    delete p1;  //메모리 제거
+    delete p2;  //메모리 제거
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+class PointPtr {
+    Point *ptr;
+
+   public:
+    PointPtr(Point *p) : ptr(p) {}
+    ~PointPtr() {
+        delete ptr;
+    }
+};
+void main() {
+    PointPtr p1 = new Point(2, 3);  //메모리 할당
+    PointPtr p2 = new Point(5, 5);  //메모리 할당
+
+    //p1->Print(); // 아직 서비스 사용 못함!
+    //p2->Print(); // 아직 서비스 사용 못함!
+
+    //p1의 소멸자에서 Point 동적 객체를 자동 메모리 제거합니다.
+    //p2의 소멸자에서 Point 동적 객체를 자동 메모리 제거합니다.
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+class PointPtr {
+    Point *ptr;
+
+   public:
+    PointPtr(Point *p) : ptr(p) {}
+    ~PointPtr() {
+        delete ptr;
+    }
+    Point *operator->() const {
+        return ptr;
+    }
+};
+void main() {
+    PointPtr p1 = new Point(2, 3);  //메모리 할당
+    PointPtr p2 = new Point(5, 5);  //메모리 할당
+
+    p1->Print();  //p1.operator->()->Print() 호출 (서비스 사용)
+    p2->Print();  //p2.operator->()->Print() 호출 (서비스 사용)
+    //p1의 소멸자에서 Point 동적 객체를 자동 메모리 제거합니다.
+    //p2의 소멸자에서 Point 동적 객체를 자동 메모리 제거합니다.
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+class PointPtr {
+    Point* ptr;
+
+   public:
+    PointPtr(Point* p) : ptr(p) {}
+    ~PointPtr() {
+        delete ptr;
+    }
+    Point* operator->() const {
+        return ptr;
+    }
+    Point& operator*() const {
+        return *ptr;
+    }
+};
+void main() {
+    Point* p1 = new Point(2, 3);    //일반 포인터
+    PointPtr p2 = new Point(5, 5);  //스마트 포인터
+
+    p1->Print();  //p1->Print() 호출
+    p2->Print();  //p2.operator->()->Print() 호출
+    cout << endl;
+
+    (*p1).Print();  //(*p1).Print() 호출
+    (*p2).Print();  //p1.operator*().Print() 호출
+
+    delete p1;
+    //p2의 소멸자에서 Point 동적 객체를 자동 메모리 제거합니다.
+}
+```
+
+## 타입 변환 연산자 오버로딩
+
+### 생성자를 이용한 타입 변환
+```cpp
+#include <iostream>
+using namespace std;
+
+class A {
+};
+class B {
+   public:
+    B() { cout << "B() 생성자" << endl; }
+    B(A& _a) { cout << "B(A _a) 생성자" << endl; }
+    B(int n) { cout << "B(int n) 생성자" << endl; }
+    B(double d) { cout << "B(double d) 생성자" << endl; }
+};
+void main() {
+    A a;
+    int n = 10;
+    double d = 5.5;
+
+    B b;    // B() 생성자 호출
+    b = a;  // b = B(a) 암시적 생성자 호출 후 대입
+    b = n;  // b = B(n) 암시적 생성자 호출 후 대입
+    b = d;  // b = B(d) 암시적 생성자 호출 후 대입
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+
+void main() {
+    Point pt;
+    pt.Print();
+
+    pt = 10;  // Point(10,0) 암시적 생성자 호출
+    pt.Print();
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    explicit Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+};
+
+void main() {
+    Point pt;
+    pt.Print();
+
+    //pt = 10; // 에러! 암시적 생성자 호출이 불가능!
+    pt = Point(10);  // 이렇게 명시적 생성자 호출만 가능!
+    pt.Print();
+}
+```
+
+### 타입 변환 연산자 오버로딩을 이용한 타입 변환
+```cpp
+#include <iostream>
+using namespace std;
+
+class A {
+};
+class B {
+   public:
+    operator A() {
+        cout << "operator A() 호출" << endl;
+        return A();
+    }
+    operator int() {
+        cout << "operator int() 호출" << endl;
+        return 10;
+    }
+    operator double() {
+        cout << "operator double() 호출" << endl;
+        return 5.5;
+    }
+};
+void main() {
+    A a;
+    int n;
+    double d;
+
+    B b;
+    a = b;  //b.operator A() 암시적 호출
+    n = b;  //b.operator int() 암시적 호출
+    d = b;  //b.operator double() 암시적 호출
+
+    cout << endl;
+    a = b.operator A();       // 명시적 호출
+    n = b.operator int();     // 명시적 호출
+    d = b.operator double();  // 명시적 호출
+}
+```
+
+```cpp
+#include <iostream>
+using namespace std;
+
+class Point {
+    int x;
+    int y;
+
+   public:
+    explicit Point(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    void Print() const { cout << x << ',' << y << endl; }
+    operator int() const {
+        return x;
+    }
+};
+void main() {
+    int n = 10;
+
+    Point pt(2, 3);
+    n = pt;  // pt.operator int() 암시적 호출
+    cout << n << endl;
 }
 ```
