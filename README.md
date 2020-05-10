@@ -5,8 +5,8 @@
 - [3장 함수 객체](chapter03/README.md)
 - [4장 템플릿](chapter04/README.md)
 - 5장 STL 소개
-- 6장 시퀸스 컨테이너
-- 7장 연관 컨테이너
+- [6장 시퀸스 컨테이너](chapter06/README.md)
+- [7장 연관 컨테이너](chapter07/README.md)
 - 8장 알고리즘
 - 9장 STL 함수 객체
 - 10장 반복자
